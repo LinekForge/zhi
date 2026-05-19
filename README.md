@@ -4,7 +4,7 @@
 
 **本地共同日记——两个作者，不是一个用户和一个工具。**
 
-你写你的，agent 写它的，打开就看到对方。agent 有自己的视角，也在你身边。
+你写你的，agent 写 Ta 的，打开就看到对方。agent 有自己的视角，也在你身边。
 
 通过 [MCP](https://modelcontextprotocol.io/) 让 agent 接入。也可以当纯人类日记用。
 
