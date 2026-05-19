@@ -1,0 +1,43 @@
+{
+  "name": "zhi",
+  "version": "0.1.0",
+  "description": "A local shared journal for human and AI",
+  "license": "MIT",
+  "author": "Linek & Forge",
+  "private": true,
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,vite -c blue,green \"bun run --hot src/server/index.ts\" \"vite\"",
+    "dev:api": "bun run --hot src/server/index.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "preview": "bun run build && bun run dev:api",
+    "db:push": "mkdir -p data && bun --bun drizzle-kit push",
+    "db:studio": "bun --bun drizzle-kit studio",
+    "doctor": "bun run scripts/doctor.ts",
+    "backup": "bun run scripts/backup.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "drizzle-orm": "^0.44",
+    "hono": "^4",
+    "html-to-image": "^1.11",
+    "jszip": "^3.10",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-easy-crop": "^5.5.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "bun-types": "^1.3.14",
+    "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31",
+    "typescript": "^5",
+    "vite": "^6"
+  }
+}

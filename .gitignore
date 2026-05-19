@@ -1,0 +1,16 @@
+node_modules/
+dist/
+data/
+drizzle/
+*.db
+*.db-shm
+*.db-wal
+*.log
+.DS_Store
+.env
+*.bak
+*.conflict-*
+.claude/
+*.sqlite
+.idea/
+.vscode/
