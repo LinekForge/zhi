@@ -75,6 +75,20 @@ const TOOLS = [
     },
   },
   {
+    name: "write_for_user",
+    description:
+      "Write a journal entry on behalf of the user (carbon author). Returns the created entry. " +
+      "Use when the user asks you to help write or record something as their own entry.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        content: { type: "string", description: "Entry body text" },
+        date: { type: "string", description: "Target date in YYYY-MM-DD format. Defaults to today" },
+      },
+      required: ["content"],
+    },
+  },
+  {
     name: "read",
     description:
       "Read journal entries from both authors. Returns an array of entries with id, author, content, and date. " +
@@ -149,6 +163,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       const r = await api("/entries", {
         method: "POST",
         body: { author: "silicon", content: a.content, date: a.date || today() },
+      });
+      return result(r);
+    }
+
+    case "write_for_user": {
+      const r = await api("/entries", {
+        method: "POST",
+        body: { author: "carbon", content: a.content, date: a.date || today() },
       });
       return result(r);
     }
