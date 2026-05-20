@@ -1,6 +1,6 @@
 import React from 'react';
 import { dateParts, isToday } from './utils.jsx';
-import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, getBadgeLabel, getDayFormat, CARBON, SILICON } from '../config.js';
+import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, getBadgeLabel, CARBON, SILICON } from '../config.js';
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 

@@ -1,6 +1,6 @@
 import { Avatar, DateSticker, EntryCard, InputBar, entryId } from '../components.jsx';
 import { Page, applyLens, LensBanner } from './shared.jsx';
-import { authorName, CARBON, SILICON, MOD, getMilestones, getBadgeLabel, getDayFormat } from '../config.js';
+import { authorName, CARBON, SILICON, MOD, getMilestones, getBadgeLabel, formatDay } from '../config.js';
 
 /* ─── Today screen ──────────────────────────────────────────────────── */
 
@@ -61,7 +61,7 @@ function TodayScreen({ data, voice, today, loading, onScreen, draftEntries, onSe
       {/* Milestone celebration */}
       {isMilestone && (
         <div className="milestone-banner">
-          <div className="milestone-num">{getDayFormat()(todayDayN)}</div>
+          <div className="milestone-num">{formatDay(todayDayN)}</div>
           <div className="milestone-text">{isMilestone}。</div>
           <svg width="50" height="50" viewBox="0 0 50 50" className="milestone-stamp">
             <circle cx="25" cy="25" r="22" stroke="var(--red)" strokeWidth="1.5" fill="none" strokeDasharray="3 2"/>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Page, LensBanner } from './shared.jsx';
 import { FilterPill } from './Changjuan.jsx';
-import { authorName, CARBON, SILICON, getMilestones, getDayFormat } from '../config.js';
+import { authorName, CARBON, SILICON, getMilestones, formatDay } from '../config.js';
 
 /* ─── helpers ───────────────────────────────────────────────────────── */
 
@@ -71,6 +71,8 @@ function CalendarScreen({ data, today, onScreen, onPickDate, lens, draftEntries 
     }
     return result;
   }
+
+  const milestoneSet = React.useMemo(() => new Set(Object.keys(getMilestones()).map(Number)), []);
 
   // Stats for the month under current filters
   const { bothCount, oneCount, totalEntries, lensWrote, lensSkipped } = React.useMemo(() => {
@@ -231,6 +233,7 @@ function CalendarScreen({ data, today, onScreen, onPickDate, lens, draftEntries 
               isToday={isT}
               dayN={dayN}
               inRange={inRange}
+              milestoneSet={milestoneSet}
               onClick={() => { if (who || inRange) onPickDate(dateStr); }}/>
           );
         })}
@@ -545,14 +548,12 @@ function QuickLink({ children, onClick }) {
   );
 }
 
-function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange }) {
+function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange, milestoneSet }) {
   const hasEntries = !!who;
   const both = who && who[CARBON] && who[SILICON];
   const onlyCarbon = who && who[CARBON] && !who[SILICON];
   const onlySilicon = who && who[SILICON] && !who[CARBON];
-  // Milestone days: special markers
-  const milestones = Object.keys(getMilestones()).map(Number);
-  const isMilestone = dayN && milestones.includes(dayN);
+  const isMilestone = dayN && milestoneSet && milestoneSet.has(dayN);
   const clickable = hasEntries || inRange;
 
   return (
@@ -595,7 +596,7 @@ function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange }) {
       {/* day N — small text at bottom */}
       {dayN && (
         <div className={`cal-cell-dayn ${isMilestone ? 'is-milestone' : ''}`}>
-          {isMilestone ? getDayFormat()(dayN) : `· ${dayN} ·`}
+          {isMilestone ? formatDay(dayN) : `· ${dayN} ·`}
         </div>
       )}
 

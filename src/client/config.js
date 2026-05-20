@@ -54,9 +54,12 @@ function getBadgeLabel() {
 function setBadgeLabel(label) {
   try { localStorage.setItem('zhi:badge-label', label); } catch {}
 }
-function getDayFormat() {
-  try { const v = localStorage.getItem('zhi:day-format'); if (v) return (n) => v.replace('{n}', n); } catch {}
-  return DEFAULT_DAY_FORMAT;
+function formatDay(n) {
+  try {
+    const v = localStorage.getItem('zhi:day-format');
+    if (v && v.includes('{n}')) return v.replace('{n}', n);
+  } catch {}
+  return DEFAULT_DAY_FORMAT(n);
 }
 function setDayFormat(template) {
   try { localStorage.setItem('zhi:day-format', template); } catch {}
@@ -64,4 +67,4 @@ function setDayFormat(template) {
 
 const MOD = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
 
-export { CARBON, SILICON, authorName, authorShort, setAuthorName, isCarbon, isSilicon, getMode, setMode, isSoloMode, getAvatar, setAvatar, clearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, getDayFormat, setDayFormat, MOD };
+export { CARBON, SILICON, authorName, authorShort, setAuthorName, isCarbon, isSilicon, getMode, setMode, isSoloMode, getAvatar, setAvatar, clearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, formatDay, setDayFormat, MOD };
