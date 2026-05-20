@@ -72,7 +72,7 @@ function CalendarScreen({ data, today, onScreen, onPickDate, lens, draftEntries 
     return result;
   }
 
-  const milestoneSet = React.useMemo(() => new Set(Object.keys(getMilestones()).map(Number)), []);
+  const milestoneSet = new Set(Object.keys(getMilestones()).map(Number));
 
   // Stats for the month under current filters
   const { bothCount, oneCount, totalEntries, lensWrote, lensSkipped } = React.useMemo(() => {
@@ -553,7 +553,7 @@ function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange, miles
   const both = who && who[CARBON] && who[SILICON];
   const onlyCarbon = who && who[CARBON] && !who[SILICON];
   const onlySilicon = who && who[SILICON] && !who[CARBON];
-  const isMilestone = dayN && milestoneSet && milestoneSet.has(dayN);
+  const isMilestone = dayN && milestoneSet.has(dayN);
   const clickable = hasEntries || inRange;
 
   return (
