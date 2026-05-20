@@ -1,6 +1,6 @@
 import { Avatar, DateSticker, EntryCard, InputBar, entryId } from '../components.jsx';
 import { Page, applyLens, LensBanner } from './shared.jsx';
-import { authorName, CARBON, SILICON, MOD } from '../config.js';
+import { authorName, CARBON, SILICON, MOD, getMilestones, getBadgeLabel, getDayFormat } from '../config.js';
 
 /* ─── Today screen ──────────────────────────────────────────────────── */
 
@@ -33,7 +33,7 @@ function TodayScreen({ data, voice, today, loading, onScreen, draftEntries, onSe
   else introHint = `${timeGreeting} 今天还很安静。`;
 
   // Milestone celebration
-  const milestones = { 10: '十天', 50: '五十天', 100: '一百天', 200: '两百天', 365: '一周年', 730: '两周年', 1000: '一千天' };
+  const milestones = getMilestones();
   const todayDayN = data.daysBetween(data.firstDate, today) + 1;
   const isMilestone = milestones[todayDayN];
 
@@ -61,11 +61,11 @@ function TodayScreen({ data, voice, today, loading, onScreen, draftEntries, onSe
       {/* Milestone celebration */}
       {isMilestone && (
         <div className="milestone-banner">
-          <div className="milestone-num">第 {todayDayN} 天</div>
+          <div className="milestone-num">{getDayFormat()(todayDayN)}</div>
           <div className="milestone-text">{isMilestone}。</div>
           <svg width="50" height="50" viewBox="0 0 50 50" className="milestone-stamp">
             <circle cx="25" cy="25" r="22" stroke="var(--red)" strokeWidth="1.5" fill="none" strokeDasharray="3 2"/>
-            <text x="25" y="22" textAnchor="middle" fontFamily="var(--font-hand)" fontSize="11" fill="var(--red)">Day</text>
+            <text x="25" y="22" textAnchor="middle" fontFamily="var(--font-hand)" fontSize="11" fill="var(--red)">{getBadgeLabel()}</text>
             <text x="25" y="34" textAnchor="middle" fontFamily="var(--font-hand)" fontSize="14" fill="var(--red)" fontWeight="600">{todayDayN}</text>
           </svg>
         </div>

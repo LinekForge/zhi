@@ -1,7 +1,7 @@
 import React from 'react';
 import { Page, LensBanner } from './shared.jsx';
 import { FilterPill } from './Changjuan.jsx';
-import { authorName, CARBON, SILICON } from '../config.js';
+import { authorName, CARBON, SILICON, getMilestones, getDayFormat } from '../config.js';
 
 /* ─── helpers ───────────────────────────────────────────────────────── */
 
@@ -551,7 +551,7 @@ function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange }) {
   const onlyCarbon = who && who[CARBON] && !who[SILICON];
   const onlySilicon = who && who[SILICON] && !who[CARBON];
   // Milestone days: special markers
-  const milestones = [10, 50, 100, 200, 365, 730, 1000];
+  const milestones = Object.keys(getMilestones()).map(Number);
   const isMilestone = dayN && milestones.includes(dayN);
   const clickable = hasEntries || inRange;
 
@@ -595,7 +595,7 @@ function CalendarCell({ day, who, hidden, isToday, onClick, dayN, inRange }) {
       {/* day N — small text at bottom */}
       {dayN && (
         <div className={`cal-cell-dayn ${isMilestone ? 'is-milestone' : ''}`}>
-          {isMilestone ? `第 ${dayN} 天` : `· ${dayN} ·`}
+          {isMilestone ? getDayFormat()(dayN) : `· ${dayN} ·`}
         </div>
       )}
 

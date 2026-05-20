@@ -1,6 +1,6 @@
 import React from 'react';
 import { dateParts, isToday } from './utils.jsx';
-import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, CARBON, SILICON } from '../config.js';
+import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, getBadgeLabel, getDayFormat, CARBON, SILICON } from '../config.js';
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 
@@ -161,7 +161,7 @@ function DaysTogetherBadge({ days }) {
           <div style={{
             fontFamily: 'var(--font-en)', fontSize: 10, letterSpacing: '0.2em',
             color: 'var(--ink-faded)', textTransform: 'uppercase',
-          }}>Day</div>
+          }}>{getBadgeLabel()}</div>
           <div style={{
             fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500,
             color: 'var(--ink)', lineHeight: 1.1, marginTop: 2,
