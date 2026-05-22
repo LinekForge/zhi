@@ -387,6 +387,8 @@ function App() {
       <Settings
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
+        showHidden={showHidden}
+        onShowHiddenChange={setShowHidden}
       />
 
       <Onboarding

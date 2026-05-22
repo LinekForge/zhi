@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Cropper from 'react-easy-crop';
 import { authorName, setAuthorName, CARBON, SILICON, getMode, setMode, getAvatar, setAvatar, clearAvatar as configClearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, getDayFormat, setDayFormat } from './config.js';
 
-function Settings({ open, onClose }) {
+function Settings({ open, onClose, showHidden, onShowHiddenChange }) {
   const [carbonName, setCarbonName] = React.useState(() => authorName(CARBON));
   const [siliconName, setSiliconName] = React.useState(() => authorName(SILICON));
   const [mode, setModeLocal] = React.useState(() => getMode());
@@ -216,6 +216,20 @@ function Settings({ open, onClose }) {
             <p className="settings-mode-hint">
               {mode === 'solo' ? '只显示你自己的日记，适合个人使用' : '两个人一起写，碳基与硅基、你与 TA'}
             </p>
+          </div>
+
+          {/* Hidden entries */}
+          <div className="settings-section">
+            <div className="settings-section-label">显示</div>
+            <div className="settings-mode-toggle">
+              <button className="settings-mode-btn" data-active={!showHidden} onClick={() => onShowHiddenChange(false)}>
+                只看可见
+              </button>
+              <button className="settings-mode-btn" data-active={showHidden} onClick={() => onShowHiddenChange(true)}>
+                包含隐藏
+              </button>
+            </div>
+            <p className="settings-mode-hint">开启后可以看到被隐藏的日记条目</p>
           </div>
 
           {/* Badge & Day Format */}

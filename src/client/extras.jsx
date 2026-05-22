@@ -78,7 +78,7 @@ function EntryActions({ entry, isFav, onToggleFav, onExport, onToggleHidden, onS
         </button>
       )}
       {onToggleHidden && (
-        <button onClick={() => { if (confirm('隐藏这条日记？可以在设置中恢复。')) onToggleHidden(entry); }} title="隐藏（可恢复）" className="entry-action-btn">
+        <button onClick={() => { if (confirm(entry.hidden ? '恢复这条日记？' : '隐藏这条日记？可以在设置中恢复。')) onToggleHidden(entry); }} title={entry.hidden ? '恢复' : '隐藏（可恢复）'} className="entry-action-btn">
           <svg width="13" height="13" viewBox="0 0 14 14">
             <path d="M1 7 Q 7 2 13 7 Q 7 12 1 7 Z" stroke="currentColor" strokeWidth="1.1" fill="none"/>
             <circle cx="7" cy="7" r="1.6" fill="currentColor"/>
