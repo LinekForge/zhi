@@ -18,7 +18,7 @@ function today(): string {
 
 function daysAgo(n: number): string {
   const d = new Date();
-  d.setDate(d.getDate() - n + 1);
+  d.setDate(d.getDate() - Math.max(1, n) + 1);
   return fmtDate(d);
 }
 
@@ -97,7 +97,7 @@ const TOOLS = [
       type: "object" as const,
       properties: {
         date: { type: "string", description: "Specific date in YYYY-MM-DD format" },
-        days: { type: "number", description: "Number of recent days to fetch (e.g. 3 = last 3 days)" },
+        days: { type: "number", minimum: 1, description: "Number of recent days to fetch (e.g. 3 = last 3 days)" },
         author: { type: "string", description: "Filter by author: 'carbon' or 'silicon'" },
       },
     },

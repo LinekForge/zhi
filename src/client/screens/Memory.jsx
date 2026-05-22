@@ -10,11 +10,10 @@ function MemoryScreen({ data, today, voice, onScreen, onPickDate, favs, onToggle
   const [_, mm, dd] = today.split('-');
   // Look for any entry date matching M-D but different year
   let memoryDate = null;
-  for (const date of Object.keys(data.byDate)) {
-    if (date.slice(5) === `${mm}-${dd}` && date !== today) {
-      memoryDate = date; break;
-    }
-  }
+  const candidates = Object.keys(data.byDate)
+    .filter(d => d.slice(5) === `${mm}-${dd}` && d !== today)
+    .sort();
+  memoryDate = candidates.at(-1) ?? null;
   // Fallback: pick the earliest available date
   if (!memoryDate) {
     const dates = Object.keys(data.byDate).sort();

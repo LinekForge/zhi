@@ -13,7 +13,7 @@ function DayDetailScreen({ data, dateStr, today, voice, onScreen, favs, onToggle
     lens
   ).sort((a, b) => a.time.localeCompare(b.time));
 
-  const daysFromFirst = data.daysBetween(data.firstDate, dateStr) + 1;
+  const daysFromFirst = Math.max(1, data.daysBetween(data.firstDate, dateStr) + 1);
   const carbonWrote = entries.some(e => e.author === CARBON);
   const siliconWrote = entries.some(e => e.author === SILICON);
 

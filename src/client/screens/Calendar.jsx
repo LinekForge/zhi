@@ -282,7 +282,7 @@ function randomDateWithEntries(data) {
   return dates[Math.floor(Math.random() * dates.length)];
 }
 
-/* ─── Year view (心跳格子 / GitHub-style heatmap) ─────────────────── */
+/* ─── Year view (GitHub-style heatmap) ────────────────────────────── */
 
 function YearView({ year, today, byDate, firstDate, lens, onPickDate, onPrevYear, onNextYear, onPickMonth }) {
   const monthNames = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];

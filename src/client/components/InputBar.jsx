@@ -48,7 +48,8 @@ function InputBar({ onSend, onLongform, placeholder = '今天想说点什么…'
     }
   }
   function handleFiles(files) {
-    const arr = Array.from(files).slice(0, MAX - images.length);
+    const MAX_FILE_BYTES = 5 * 1024 * 1024;
+    const arr = Array.from(files).filter(f => f.size <= MAX_FILE_BYTES).slice(0, MAX - images.length);
     Promise.all(arr.map(f => new Promise(res => {
       const fr = new FileReader();
       fr.onload = () => res(fr.result);

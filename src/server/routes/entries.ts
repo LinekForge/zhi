@@ -162,7 +162,8 @@ entries.get("/entries/:id", async (c) => {
 });
 
 entries.post("/entries", async (c) => {
-  const body = await c.req.json();
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: "invalid json" }, 400); }
   if (!validateAuthor(body.author)) return c.json({ error: ERRORS.INVALID_AUTHOR }, 400);
   if (!body.content?.trim()) return c.json({ error: ERRORS.CONTENT_REQUIRED }, 400);
   if (body.content.length > 50000) return c.json({ error: ERRORS.CONTENT_TOO_LONG }, 400);
@@ -202,9 +203,11 @@ entries.post("/entries", async (c) => {
           if (!ext) continue;
           const filename = `${randomUUID()}.${ext}`;
           const filePath = resolve(IMAGES_DIR, filename);
-          await writeFile(filePath, raw);
+          try { await writeFile(filePath, raw); } catch (e) { console.error("image write failed:", e); continue; }
           imgPath = `/images/${filename}`;
-        } else if (typeof imgPath === "string" && !imgPath.startsWith("/images/")) {
+        } else if (typeof imgPath === "string" && /^\/images\/[0-9a-f-]+\.\w+$/.test(imgPath)) {
+          // re-use existing image path — validated UUID format
+        } else {
           continue;
         }
 
@@ -225,7 +228,8 @@ entries.post("/entries", async (c) => {
 entries.patch("/entries/:id", async (c) => {
   const id = parseId(c.req.param("id"));
   if (!id) return c.json({ error: ERRORS.INVALID_ID }, 400);
-  const body = await c.req.json();
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: "invalid json" }, 400); }
   if (!validateAuthor(body.author)) return c.json({ error: ERRORS.INVALID_AUTHOR }, 400);
   if (!body.content?.trim()) return c.json({ error: ERRORS.CONTENT_REQUIRED }, 400);
   if (body.content.length > 50000) return c.json({ error: ERRORS.CONTENT_TOO_LONG }, 400);

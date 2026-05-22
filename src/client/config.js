@@ -1,70 +1,87 @@
-const AUTHORS = {
-  carbon: { id: 'carbon', name: '你' },
-  silicon: { id: 'silicon', name: 'AI' },
-};
-
 const CARBON = 'carbon';
 const SILICON = 'silicon';
 
-function authorName(id) {
-  try { const v = localStorage.getItem(`zhi:name:${id}`); if (v) return v; } catch {}
-  return AUTHORS[id]?.name ?? id;
+let _config = null;
+let _persistTimer = null;
+
+function _ls(key) { try { return localStorage.getItem(key); } catch { return null; } }
+function _lsSet(key, v) { try { localStorage.setItem(key, v); } catch {} }
+function _lsRm(key) { try { localStorage.removeItem(key); } catch {} }
+
+function _defaults() {
+  return {
+    names: { carbon: '碳基', silicon: '硅基' },
+    mode: 'duo',
+    badge: 'Day',
+    dayFormat: '',
+    milestones: { 10: '十天', 50: '五十天', 100: '一百天', 200: '两百天', 365: '一周年', 730: '两周年', 1000: '一千天' },
+  };
 }
-function authorShort(id) {
-  const name = authorName(id);
-  return name.slice(0, 2);
+
+function _cached() {
+  try { const v = _ls('zhi:config'); if (v) return JSON.parse(v); } catch {}
+  return null;
 }
-function setAuthorName(id, name) {
-  try { localStorage.setItem(`zhi:name:${id}`, name); } catch {}
+
+function _get() {
+  if (_config) return _config;
+  _config = _cached() || _defaults();
+  return _config;
 }
+
+function _persist(patch) {
+  const prev = _get();
+  _config = { ...prev, ...patch };
+  if (patch.names) _config.names = { ...prev.names, ...patch.names };
+  if (patch.milestones !== undefined) _config.milestones = patch.milestones;
+  _lsSet('zhi:config', JSON.stringify(_config));
+  clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(() => {
+    fetch('/api/config', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(_config) }).catch(() => {});
+  }, 400);
+}
+
+async function syncConfig() {
+  if (_persistTimer) return;
+  try {
+    const r = await fetch('/api/config');
+    if (!r.ok) return;
+    _config = await r.json();
+    _lsSet('zhi:config', JSON.stringify(_config));
+  } catch {}
+}
+
+function authorName(id) { return _get().names?.[id] ?? id; }
+function authorShort(id) { return authorName(id).slice(0, 2); }
+function setAuthorName(id, name) { _persist({ names: { [id]: name } }); }
+
 function isCarbon(author) { return author === CARBON; }
 function isSilicon(author) { return author === SILICON; }
 
-function getMode() {
-  try { return localStorage.getItem('zhi:mode') || 'duo'; } catch { return 'duo'; }
-}
-function setMode(mode) {
-  try { localStorage.setItem('zhi:mode', mode); } catch {}
-}
+function getMode() { return _get().mode || 'duo'; }
+function setMode(mode) { _persist({ mode }); }
 function isSoloMode() { return getMode() === 'solo'; }
-function getAvatar(id) {
-  try { return localStorage.getItem(`zhi:avatar:${id}`) || null; } catch { return null; }
-}
-function setAvatar(id, dataUrl) {
-  try { localStorage.setItem(`zhi:avatar:${id}`, dataUrl); } catch {}
-}
-function clearAvatar(id) {
-  try { localStorage.removeItem(`zhi:avatar:${id}`); } catch {}
-}
 
-const DEFAULT_MILESTONES = { 10: '十天', 50: '五十天', 100: '一百天', 200: '两百天', 365: '一周年', 730: '两周年', 1000: '一千天' };
-const DEFAULT_BADGE_LABEL = 'Day';
-const DEFAULT_DAY_FORMAT = (n) => `第 ${n} 天`;
+function getAvatar(id) { return _ls(`zhi:avatar:${id}`); }
+function setAvatar(id, dataUrl) { _lsSet(`zhi:avatar:${id}`, dataUrl); }
+function clearAvatar(id) { _lsRm(`zhi:avatar:${id}`); }
 
-function getMilestones() {
-  try { const v = localStorage.getItem('zhi:milestones'); if (v) return JSON.parse(v); } catch {}
-  return DEFAULT_MILESTONES;
+function getMilestones() { return _get().milestones || {}; }
+function setMilestones(obj) { _persist({ milestones: obj }); }
+
+function getBadgeLabel() { return _get().badge || 'Day'; }
+function setBadgeLabel(label) { _persist({ badge: label }); }
+
+function getDayFormat() { return _get().dayFormat || ''; }
+function formatDayParts(n) {
+  const fmt = _get().dayFormat;
+  const tpl = (fmt && fmt.includes('{n}')) ? fmt : '第 {n} 天';
+  const i = tpl.indexOf('{n}');
+  return [tpl.slice(0, i), String(n), tpl.slice(i + 3)];
 }
-function setMilestones(obj) {
-  try { localStorage.setItem('zhi:milestones', JSON.stringify(obj)); } catch {}
-}
-function getBadgeLabel() {
-  try { return localStorage.getItem('zhi:badge-label') || DEFAULT_BADGE_LABEL; } catch { return DEFAULT_BADGE_LABEL; }
-}
-function setBadgeLabel(label) {
-  try { localStorage.setItem('zhi:badge-label', label); } catch {}
-}
-function formatDay(n) {
-  try {
-    const v = localStorage.getItem('zhi:day-format');
-    if (v && v.includes('{n}')) return v.replace('{n}', n);
-  } catch {}
-  return DEFAULT_DAY_FORMAT(n);
-}
-function setDayFormat(template) {
-  try { localStorage.setItem('zhi:day-format', template); } catch {}
-}
+function formatDay(n) { return formatDayParts(n).join(''); }
+function setDayFormat(template) { _persist({ dayFormat: template }); }
 
 const MOD = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
 
-export { CARBON, SILICON, authorName, authorShort, setAuthorName, isCarbon, isSilicon, getMode, setMode, isSoloMode, getAvatar, setAvatar, clearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, formatDay, setDayFormat, MOD };
+export { CARBON, SILICON, authorName, authorShort, setAuthorName, isCarbon, isSilicon, getMode, setMode, isSoloMode, getAvatar, setAvatar, clearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, getDayFormat, formatDay, formatDayParts, setDayFormat, syncConfig, MOD };

@@ -6,6 +6,7 @@ import { annotations } from "./annotations";
 import { favorites } from "./favorites";
 import { calendar } from "./calendar";
 import { typing } from "./typing";
+import { config } from "./config";
 
 const api = new Hono();
 
@@ -23,5 +24,6 @@ api.route("/", annotations);
 api.route("/", favorites);
 api.route("/", calendar);
 api.route("/", typing);
+api.route("/", config);
 
 export { api };

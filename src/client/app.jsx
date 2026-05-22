@@ -3,7 +3,7 @@ import { useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakSelect, TweakTog
 import { PaperTexture, TopNav } from './components.jsx';
 import { useFavorites, ExportModal } from './extras.jsx';
 import { pad } from './utils.jsx';
-import { CARBON, SILICON } from './config.js';
+import { CARBON, SILICON, syncConfig } from './config.js';
 import { TodayScreen, CalendarScreen, MemoryScreen, DayDetailScreen, ChangjuanScreen, AlbumScreen } from './screens.jsx';
 import { LongformEditor } from './longform.jsx';
 import { InlineWriter } from './inline-writer.jsx';
@@ -21,8 +21,9 @@ const typeLabels = { shujuan: '书卷', xinjian: '信笺', xiandai: '现代', sh
 const densityLabels = { compact: '紧凑', regular: '舒适', comfy: '宽松' };
 
 function daysBetween(a, b) {
-  const ms = new Date(b) - new Date(a);
-  return Math.round(ms / 86400000);
+  const [ay, am, ad] = a.split('-').map(Number);
+  const [by, bm, bd] = b.split('-').map(Number);
+  return Math.round((new Date(by, bm - 1, bd) - new Date(ay, am - 1, ad)) / 86400000);
 }
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -75,7 +76,7 @@ function App() {
   function fetchEntries() {
     const params = showHidden ? '?showHidden=true' : '';
     fetch('/api/entries' + params)
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(rows => {
         setApiEntries(rows.map(r => {
           const d = new Date(r.createdAt);
@@ -104,6 +105,7 @@ function App() {
   addAnnotationRef.current = addAnnotation;
   editEntryRef.current = editEntry;
 
+  React.useEffect(() => { syncConfig(); }, []);
   React.useEffect(() => { fetchEntries(); }, [showHidden]);
 
   // 轮询 pulse：AI 通过 MCP 写入后自动刷新

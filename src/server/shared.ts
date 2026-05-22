@@ -1,6 +1,5 @@
-import { resolve } from "path";
+export { IMAGES_DIR } from "./paths";
 
-export const IMAGES_DIR = resolve(import.meta.dir, "../../data/images");
 export const VALID_AUTHORS = new Set(["carbon", "silicon"]);
 export const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;

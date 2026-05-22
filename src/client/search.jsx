@@ -122,7 +122,7 @@ function SearchPanel({ open, data, favs, onClose, onPickDate }) {
                 setActiveIdx(i => Math.max(0, i - 1));
               } else if (e.key === 'Enter') {
                 e.preventDefault();
-                handleResultClick(results[activeIdx]);
+                if (results[activeIdx]) handleResultClick(results[activeIdx]);
               }
             }}
           />

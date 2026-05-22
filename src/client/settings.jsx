@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Cropper from 'react-easy-crop';
-import { authorName, setAuthorName, CARBON, SILICON, getMode, setMode, isSoloMode, getAvatar, setAvatar, clearAvatar as configClearAvatar } from './config.js';
+import { authorName, setAuthorName, CARBON, SILICON, getMode, setMode, getAvatar, setAvatar, clearAvatar as configClearAvatar, getMilestones, setMilestones, getBadgeLabel, setBadgeLabel, getDayFormat, setDayFormat } from './config.js';
 
 function Settings({ open, onClose }) {
   const [carbonName, setCarbonName] = React.useState(() => authorName(CARBON));
@@ -9,7 +9,12 @@ function Settings({ open, onClose }) {
   const [mode, setModeLocal] = React.useState(() => getMode());
   const [avatarKey, setAvatarKey] = React.useState(0);
 
-  // Crop state
+  const [badgeLabel, setBadgeLabelLocal] = React.useState(() => getBadgeLabel());
+  const [dayFmt, setDayFmtLocal] = React.useState(() => getDayFormat());
+  const [milestones, setMilestonesLocal] = React.useState(() => getMilestones());
+  const [newDay, setNewDay] = React.useState('');
+  const [newLabel, setNewLabel] = React.useState('');
+
   const [cropSrc, setCropSrc] = React.useState(null);
   const [cropAuthor, setCropAuthor] = React.useState(null);
   const [crop, setCrop] = React.useState({ x: 0, y: 0 });
@@ -21,6 +26,9 @@ function Settings({ open, onClose }) {
       setCarbonName(authorName(CARBON));
       setSiliconName(authorName(SILICON));
       setModeLocal(getMode());
+      setBadgeLabelLocal(getBadgeLabel());
+      setDayFmtLocal(getDayFormat());
+      setMilestonesLocal(getMilestones());
       setAvatarKey(k => k + 1);
     }
   }, [open]);
@@ -42,6 +50,19 @@ function Settings({ open, onClose }) {
   function handleCarbonName(e) { setCarbonName(e.target.value); setAuthorName(CARBON, e.target.value); }
   function handleSiliconName(e) { setSiliconName(e.target.value); setAuthorName(SILICON, e.target.value); }
   function handleMode(m) { setModeLocal(m); setMode(m); }
+  function handleBadgeLabel(e) { setBadgeLabelLocal(e.target.value); setBadgeLabel(e.target.value); }
+  function handleDayFmt(e) { setDayFmtLocal(e.target.value); setDayFormat(e.target.value); }
+  function addMilestone() {
+    const day = parseInt(newDay, 10);
+    if (!day || day <= 0 || !newLabel.trim()) return;
+    const next = { ...milestones, [day]: newLabel.trim() };
+    setMilestonesLocal(next); setMilestones(next);
+    setNewDay(''); setNewLabel('');
+  }
+  function removeMilestone(day) {
+    const next = { ...milestones }; delete next[day];
+    setMilestonesLocal(next); setMilestones(next);
+  }
 
   function pickImage(authorId) {
     const input = document.createElement('input');
@@ -142,7 +163,8 @@ function Settings({ open, onClose }) {
             <div className="settings-section-label">头像</div>
             <div className="settings-avatar-row">
               <div className="settings-avatar-slot">
-                <div className="settings-avatar-upload" onClick={() => pickImage(CARBON)}
+                <div className="settings-avatar-upload" role="button" tabIndex={0} aria-label="上传头像"
+                  onClick={() => pickImage(CARBON)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), pickImage(CARBON))}
                   title="点击上传头像" style={{ borderColor: 'var(--carbon)' }}>
                   {carbonAvatar
                     ? <img src={carbonAvatar} alt="" key={avatarKey + '-c'} />
@@ -153,7 +175,8 @@ function Settings({ open, onClose }) {
               </div>
               {mode !== 'solo' && (
                 <div className="settings-avatar-slot">
-                  <div className="settings-avatar-upload" onClick={() => pickImage(SILICON)}
+                  <div className="settings-avatar-upload" role="button" tabIndex={0} aria-label="上传头像"
+                    onClick={() => pickImage(SILICON)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), pickImage(SILICON))}
                     title="点击上传头像" style={{ borderColor: 'var(--silicon)' }}>
                     {siliconAvatar
                       ? <img src={siliconAvatar} alt="" key={avatarKey + '-s'} />
@@ -193,6 +216,49 @@ function Settings({ open, onClose }) {
             <p className="settings-mode-hint">
               {mode === 'solo' ? '只显示你自己的日记，适合个人使用' : '两个人一起写，碳基与硅基、你与 TA'}
             </p>
+          </div>
+
+          {/* Badge & Day Format */}
+          <div className="settings-section">
+            <div className="settings-section-label">标记</div>
+            <div className="settings-name-row">
+              <label className="settings-name-label">徽章</label>
+              <input className="settings-name-input" type="text"
+                value={badgeLabel} onChange={handleBadgeLabel}
+                placeholder="Day" maxLength={10}/>
+            </div>
+            <div className="settings-name-row">
+              <label className="settings-name-label">日期</label>
+              <input className="settings-name-input" type="text"
+                value={dayFmt} onChange={handleDayFmt}
+                placeholder="第 {n} 天"/>
+            </div>
+            <p className="settings-mode-hint">{'{n}'} 会替换为天数，留空使用默认格式</p>
+          </div>
+
+          {/* Milestones */}
+          <div className="settings-section">
+            <div className="settings-section-label">纪念日</div>
+            <div className="settings-milestones">
+              {Object.entries(milestones)
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([day, label]) => (
+                  <div className="settings-milestone-row" key={day}>
+                    <span className="settings-milestone-day">{day} 天</span>
+                    <span className="settings-milestone-label">{label}</span>
+                    <button className="settings-milestone-remove" onClick={() => removeMilestone(day)} title="移除">×</button>
+                  </div>
+                ))}
+              <div className="settings-milestone-add">
+                <input className="settings-milestone-input-day" type="number" min="1"
+                  value={newDay} onChange={e => setNewDay(e.target.value)}
+                  placeholder="天数" onKeyDown={e => e.key === 'Enter' && addMilestone()}/>
+                <input className="settings-milestone-input-label" type="text"
+                  value={newLabel} onChange={e => setNewLabel(e.target.value)}
+                  placeholder="名称" maxLength={20} onKeyDown={e => e.key === 'Enter' && addMilestone()}/>
+                <button className="settings-milestone-add-btn" onClick={addMilestone} title="添加">+</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

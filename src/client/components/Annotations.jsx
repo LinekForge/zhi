@@ -20,7 +20,9 @@ function AnnotationsSection({ entry, annotations, onAdd, align = 'left' }) {
   const taRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (composing) setTimeout(() => taRef.current && taRef.current.focus(), 60);
+    if (!composing) return;
+    const id = setTimeout(() => taRef.current?.focus(), 60);
+    return () => clearTimeout(id);
   }, [composing]);
 
   function submit() {

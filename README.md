@@ -84,7 +84,7 @@ bun run dev
 | 工具 | 说明 |
 |------|------|
 | `write` | 写一篇日记（agent 身份） |
-| `write_for_user` | 帮用户代写一篇日记（用户身份） |
+| `write_for_user` | 帮用户代写一篇日记（用户身份）— agent 需要用户明确授权才应调用 |
 | `read` | 读条目——今天的、某天的、最近几天的 |
 | `search` | 关键词搜索 |
 | `respond` | 给对方的条目加批注（默认找人类今天最新的一篇） |
@@ -101,14 +101,35 @@ MCP 配置好、开发服务器跑起来之后，对你的 agent 说：
 
 ## 作者配置
 
-编辑 `src/client/config.js` 自定义两位作者的显示名：
+打开设置面板（右上角设置按钮），可以自定义：
 
-```js
-const AUTHORS = {
-  carbon: { id: 'carbon', name: '你', short: '你' },
-  silicon: { id: 'silicon', name: 'AI', short: 'AI' },
-};
+- 两位作者的显示名
+- 头像
+- 徽章文案和日期格式
+- 纪念日
+
+配置存在 `data/config.json`，也可以直接编辑这个文件或通过 API 修改：
+
+```bash
+# 读取当前配置
+curl http://localhost:3000/api/config
+
+# 修改配置
+curl -X PATCH http://localhost:3000/api/config \
+  -H 'Content-Type: application/json' \
+  -d '{"names":{"carbon":"我","silicon":"Ta"},"badge":"Day"}'
 ```
+
+## 数据目录
+
+默认数据存在项目根目录的 `data/`。想把数据放到项目外面（比如更新代码时不用担心误删），设环境变量：
+
+```bash
+# .env
+DATA_DIR=/path/to/your/journal-data
+```
+
+不设就走默认，对现有用户没有任何影响。
 
 ## 脚本
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { dateParts, isToday } from './utils.jsx';
-import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, getBadgeLabel, CARBON, SILICON } from '../config.js';
+import { authorShort, authorName, isSilicon, isSoloMode, getAvatar, getBadgeLabel, formatDayParts, CARBON, SILICON } from '../config.js';
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 
@@ -125,6 +125,13 @@ function BrandMark({ size = 22 }) {
 
 function DaysTogetherBadge({ days }) {
   const [open, setOpen] = React.useState(false);
+  const [dayPre, dayN, daySuf] = formatDayParts(days);
+  React.useEffect(() => {
+    if (!open) return;
+    function onKey(e) { if (e.key === 'Escape') setOpen(false); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
   return (
     <div style={{ position: 'relative' }}>
       <button
@@ -166,7 +173,7 @@ function DaysTogetherBadge({ days }) {
             fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500,
             color: 'var(--ink)', lineHeight: 1.1, marginTop: 2,
           }}>
-            第 <span style={{ color: 'var(--red)' }}>{days}</span> 天
+            {dayPre}<span style={{ color: 'var(--red)' }}>{dayN}</span>{daySuf}
           </div>
           <svg width="84" height="6" viewBox="0 0 84 6" style={{ marginTop: 4 }}>
             <path d="M2 3 C 20 1, 40 5, 82 3"

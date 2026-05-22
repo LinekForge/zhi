@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import { api } from "./routes/index";
 import { resolve } from "path";
+import { DATA_DIR } from "./paths";
 
 const app = new Hono();
 
@@ -17,7 +18,7 @@ app.route("/api", api);
 // Serve uploaded images
 app.use(
   "/images/*",
-  serveStatic({ root: resolve(import.meta.dir, "../../data") })
+  serveStatic({ root: DATA_DIR })
 );
 
 // Serve frontend (Vite build output) — static assets first, SPA fallback second

@@ -21,6 +21,7 @@ function AlbumScreen({ data, lens, onPickDate }) {
   const months = Object.keys(byMonth).sort().reverse();
 
   const [lightboxIdx, setLightboxIdx] = React.useState(null);
+  React.useEffect(() => { setLightboxIdx(null); }, [lens]);
 
   return (
     <Page>

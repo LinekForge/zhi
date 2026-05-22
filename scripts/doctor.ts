@@ -3,6 +3,7 @@ import { Database } from "bun:sqlite";
 import { existsSync, accessSync, constants } from "fs";
 import { resolve } from "path";
 import { createServer } from "net";
+import { DATA_DIR, DB_PATH } from "../src/server/paths";
 
 const ROOT = resolve(import.meta.dir, "..");
 
@@ -32,7 +33,7 @@ else fail("Bun", `${bunVersion} — need 1.x+`);
 // 2. Dependencies
 const nmPath = resolve(ROOT, "node_modules");
 if (existsSync(nmPath)) {
-  const deps = ["hono", "drizzle-orm", "react", "react-dom"];
+  const deps = ["hono", "drizzle-orm", "react", "react-dom", "concurrently"];
   const missing = deps.filter((d) => !existsSync(resolve(nmPath, d)));
   if (missing.length) fail("依赖", `缺少: ${missing.join(", ")}. 跑 bun install`);
   else ok("依赖", `${deps.length} 个核心包都在`);
@@ -41,15 +42,14 @@ if (existsSync(nmPath)) {
 }
 
 // 3. data/ directory
-const dataDir = resolve(ROOT, "data");
-const imagesDir = resolve(ROOT, "data/images");
+const imagesDir = resolve(DATA_DIR, "images");
 try {
-  if (!existsSync(dataDir)) {
-    fail("data/", `${dataDir} 不存在. 跑 mkdir -p data/images`);
+  if (!existsSync(DATA_DIR)) {
+    fail("data/", `${DATA_DIR} 不存在. 跑 mkdir -p data/images`);
   } else if (!existsSync(imagesDir)) {
     fail("data/images", `${imagesDir} 不存在. 跑 mkdir -p data/images`);
   } else {
-    accessSync(dataDir, constants.W_OK);
+    accessSync(DATA_DIR, constants.W_OK);
     ok("data/", "可写");
   }
 } catch {
@@ -57,7 +57,6 @@ try {
 }
 
 // 4. SQLite
-const dbPath = resolve(dataDir, "journal.db");
 try {
   const testDb = new Database(":memory:");
   testDb.run("CREATE TABLE _t (id INTEGER PRIMARY KEY)");
@@ -66,8 +65,8 @@ try {
   testDb.close();
   if (row?.id === 1) ok("SQLite", "内存读写正常");
   else fail("SQLite", "读写测试失败");
-  if (existsSync(dbPath)) ok("SQLite 数据库", dbPath);
-  else warn("SQLite 数据库", `${dbPath} 尚未创建（首次启动时自动创建）`);
+  if (existsSync(DB_PATH)) ok("SQLite 数据库", DB_PATH);
+  else warn("SQLite 数据库", `${DB_PATH} 尚未创建（首次启动时自动创建）`);
 } catch (e) {
   fail("SQLite", e instanceof Error ? e.message : String(e));
 }
