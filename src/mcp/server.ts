@@ -160,17 +160,19 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 
   switch (name) {
     case "write": {
+      const date = a.date || today();
       const r = await api("/entries", {
         method: "POST",
-        body: { author: "silicon", content: a.content, date: a.date || today() },
+        body: { author: "silicon", content: a.content, date, writtenAt: date !== today() ? today() : undefined },
       });
       return result(r);
     }
 
     case "write_for_user": {
+      const date = a.date || today();
       const r = await api("/entries", {
         method: "POST",
-        body: { author: "carbon", content: a.content, date: a.date || today() },
+        body: { author: "carbon", content: a.content, date, writtenAt: date !== today() ? today() : undefined },
       });
       return result(r);
     }

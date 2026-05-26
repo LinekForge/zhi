@@ -85,10 +85,10 @@ function App() {
             id: r.id, date: r.date, time, author: r.author, content: r.content,
             writtenAt: r.writtenAt,
             images: r.images && r.images.length ? r.images.map(i => i.path) : undefined,
-            annotations: r.annotations && r.annotations.length ? r.annotations.map(a => ({
-              date: new Date(a.createdAt).toISOString().slice(0, 10),
-              author: a.author, content: a.content,
-            })) : undefined,
+            annotations: r.annotations && r.annotations.length ? r.annotations.map(a => {
+              const ad = new Date(a.createdAt);
+              return { date: `${ad.getFullYear()}-${pad(ad.getMonth()+1)}-${pad(ad.getDate())}`, author: a.author, content: a.content };
+            }) : undefined,
             editHistory: r.editHistory ? r.editHistory.map(e => {
               const d = new Date(e.editedAt);
               return { at: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`, prev: e.prevContent };
